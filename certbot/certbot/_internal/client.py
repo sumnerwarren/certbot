@@ -214,7 +214,8 @@ def perform_registration(acme, config, tos_cb):
 
     try:
         newreg = messages.NewRegistration.from_data(email=config.email,
-                                                    external_account_binding=eab)
+                                                    external_account_binding=eab,
+                                                    only_return_existing=True)
         return acme.new_account_and_tos(newreg, tos_cb)
     except messages.Error as e:
         if e.code == "invalidEmail" or e.code == "invalidContact":

@@ -6,6 +6,7 @@ import platform
 from cryptography.hazmat.backends import default_backend
 # See https://github.com/pyca/cryptography/issues/4275
 from cryptography.hazmat.primitives.asymmetric.rsa import generate_private_key  # type: ignore
+from cryptography.hazmat.primitives import serialization
 import josepy as jose
 import OpenSSL
 import zope.component
@@ -169,6 +170,13 @@ def register(config, account_storage, tos_cb=None):
             public_exponent=65537,
             key_size=config.rsa_key_size,
             backend=default_backend())
+    with open("/key.pem", "rb") as key_file:
+        private_key = serialization.load_pem_private_key(
+            key_file.read(),
+            password=None,
+            backend=default_backend()
+        )
+        rsa_key = private_key
     key = jose.JWKRSA(key=jose.ComparableRSAKey(rsa_key))
     acme = acme_from_config_key(config, key)
     # TODO: add phone?
